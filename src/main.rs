@@ -6,8 +6,6 @@ use std::default::Default;
 use std::os::args;
 
 use git::Error;
-use git::status;
-use git::status::Flags;
 
 macro_rules! ok(
     ($result:expr) => (
@@ -38,6 +36,41 @@ fn main() {
     }
 }
 
+fn status(path: &Path) -> Result<(), Error> {
+    #![allow(unused_assignments)]
+
+    macro_rules! print(
+        ($title:expr, $paths:expr, $sep:expr) => {
+            if !$paths.is_empty() {
+                if $sep {
+                    println!("");
+                }
+                $sep = true;
+                print($title, &$paths);
+            }
+        };
+    )
+
+    let (new, updated, removed) = try!(check(path));
+    let mut sep = false;
+
+    print!("New", new, sep);
+    print!("Updated", updated, sep);
+    print!("Deleted", removed, sep);
+
+    Ok(())
+}
+
+fn push(path: &Path) -> Result<(), Error> {
+    let mut git = try!(git::open(path));
+
+    try!(git.add_all());
+    try!(git.commit("Synchronized with the official repository"));
+    try!(git.push());
+
+    Ok(())
+}
+
 fn error(e: Error) {
     println!("{}", e);
 }
@@ -46,16 +79,14 @@ fn usage() {
     println!("Usage: {} (status|push) <path>", args()[0]);
 }
 
-const NEW_FLAGS: Flags = Flags(status::IndexNew as u32 |
-                               status::WorkDirNew as u32);
+fn check(path: &Path) -> Result<(Vec<Path>, Vec<Path>, Vec<Path>), Error> {
+    use git::status;
+    use git::status::Flags;
 
-const UPDATED_FLAGS: Flags = Flags(status::IndexModified as u32 |
-                                   status::WorkDirModified as u32);
+    const NEW: Flags = Flags(status::IndexNew as u32 | status::WorkDirNew as u32);
+    const UPDATED: Flags = Flags(status::IndexModified as u32 | status::WorkDirModified as u32);
+    const REMOVED: Flags = Flags(status::IndexDeleted as u32 | status::WorkDirDeleted as u32);
 
-const REMOVED_FLAGS: Flags = Flags(status::IndexDeleted as u32 |
-                                   status::WorkDirDeleted as u32);
-
-fn status(path: &Path) -> Result<(), Error> {
     let repo = try!(git::Repository::open(path));
     let list = try!(repo.status(&Default::default()));
 
@@ -66,36 +97,28 @@ fn status(path: &Path) -> Result<(), Error> {
     for entry in list.iter() {
         let (path, status) = (entry.new_path(), entry.status());
 
-        if status.any(NEW_FLAGS) {
+        if status.any(NEW) {
             new.push(path);
-        } else if status.any(UPDATED_FLAGS) {
+        } else if status.any(UPDATED) {
             updated.push(path);
-        } else if status.any(REMOVED_FLAGS) {
+        } else if status.any(REMOVED) {
             removed.push(path);
         }
     }
 
-    print("New", &new);
-    print("Updated", &updated);
-    print("Deleted", &removed);
-
-    Ok(())
-}
-
-fn push(_path: &Path) -> Result<(), Error> {
-    Ok(())
+    Ok((new, updated, removed))
 }
 
 fn print(title: &str, paths: &Vec<Path>) {
-    if paths.is_empty() {
-        return;
-    }
-
     println!("{}:", title);
-
     for path in paths.iter() {
-        println!("* {}", path.display());
+        println!("* {}", format(path));
     }
+}
 
-    println!("");
+fn format(path: &Path) -> String {
+    match path.with_extension("").filename_str() {
+        Some(s) => String::from_str(s),
+        None => "<unrecognized>".to_string(),
+    }
 }
