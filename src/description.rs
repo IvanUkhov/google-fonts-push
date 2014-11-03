@@ -22,17 +22,17 @@ impl Description {
         }
     }
 
-    pub fn load(dir: &Path) -> Description {
+    pub fn load(path: &Path) -> Description {
         let mut desc = Description::new();
 
-        Description::populate_by_metadata(&mut desc, dir);
-        Description::populate_by_inference(&mut desc, dir);
-        Description::populate_by_guessing(&mut desc, dir);
+        Description::populate_by_metadata(&mut desc, path);
+        Description::populate_by_inference(&mut desc, path);
+        Description::populate_by_guessing(&mut desc, path);
 
         desc
     }
 
-    fn populate_by_metadata(desc: &mut Description, dir: &Path) {
+    fn populate_by_metadata(desc: &mut Description, path: &Path) {
         use std::io::fs;
         use std::io::fs::PathExtensions;
 
@@ -45,7 +45,7 @@ impl Description {
             };
         )
 
-        let path = dir.join("METADATA.json");
+        let path = path.dir_path().join("METADATA.json");
 
         if !path.exists() {
             return;
@@ -66,60 +66,42 @@ impl Description {
         }
     }
 
-    fn populate_by_inference(desc: &mut Description, dir: &Path) {
-        use std::io::fs;
-        use std::io::fs::PathExtensions;
-
+    fn populate_by_inference(desc: &mut Description, path: &Path) {
         if desc.name.is_some() {
             return;
         }
 
-        let contents = match fs::readdir(dir) {
-            Ok(contents) => contents,
-            Err(_) => return,
+        match path.extension() {
+            Some(b"ttf") | Some(b"TTF") => {},
+            _ => return,
+        }
+
+        let path = path.with_extension("");
+        let blob = match path.filename_str() {
+            Some(blob) => blob,
+            _ => return,
         };
 
-        for path in contents.iter() {
-            if path.is_dir() {
-                continue;
+        let blob = match blob.split('-').next() {
+            Some(blob) => blob,
+            _ => return,
+        };
+
+        let mut name = String::new();
+        for (i, c) in blob.char_indices() {
+            match c {
+                'A'...'Z' if i > 0 => {
+                    name.push(' ');
+                    name.push(c);
+                },
+                _ => {
+                    name.push(c);
+                },
             }
+        }
 
-            match path.extension() {
-                Some(b"ttf") | Some(b"TTF") => {},
-                _ => continue,
-            }
-
-            let path = path.with_extension("");
-            let blob = match path.filename_str() {
-                Some(blob) => blob,
-                _ => continue,
-            };
-
-            let blob = match blob.split('-').next() {
-                Some(blob) => blob,
-                _ => continue,
-            };
-
-            let mut name = String::new();
-            for (i, c) in blob.char_indices() {
-                match c {
-                    'A'...'Z' if i > 0 => {
-                        name.push(' ');
-                        name.push(c);
-                    },
-                    _ => {
-                        name.push(c);
-                    },
-                }
-            }
-
-            if name.is_empty() {
-                continue;
-            }
-
+        if !name.is_empty() {
             desc.name = Some(name);
-
-            break;
         }
     }
 

@@ -84,6 +84,10 @@ fn check(dir: &Path) -> Result<(Vec<Path>, Vec<Path>, Vec<Path>), Error> {
     use git::status;
     use git::status::Flags;
 
+    macro_rules! equal(
+        ($one:expr, $two:expr) => ($one.dir_path() == $two.dir_path());
+    )
+
     const NEW: Flags = Flags(status::IndexNew as u32 | status::WorkDirNew as u32);
     const UPDATED: Flags = Flags(status::IndexModified as u32 | status::WorkDirModified as u32);
     const REMOVED: Flags = Flags(status::IndexDeleted as u32 | status::WorkDirDeleted as u32);
@@ -96,14 +100,14 @@ fn check(dir: &Path) -> Result<(Vec<Path>, Vec<Path>, Vec<Path>), Error> {
     let mut removed = vec![];
 
     fn push(vec: &mut Vec<Path>, path: &Path) {
-        if vec.iter().find(|&p| p == path).is_none() {
+        if vec.iter().find(|&p| equal!(p, path)).is_none() {
             vec.push(path.clone());
         }
     }
 
     for entry in list.iter() {
         let status = entry.status();
-        let path = dir.join(entry.new_path()).dir_path();
+        let path = dir.join(entry.new_path());
 
         if status.any(NEW) {
             push(&mut new, &path);
@@ -115,7 +119,7 @@ fn check(dir: &Path) -> Result<(Vec<Path>, Vec<Path>, Vec<Path>), Error> {
     }
 
     let new = new.into_iter().filter(|path| {
-        if removed.iter().find(|&p| p == path).is_some() {
+        if removed.iter().find(|&p| equal!(p, path)).is_some() {
             push(&mut updated, path);
             false
         } else {
@@ -124,7 +128,7 @@ fn check(dir: &Path) -> Result<(Vec<Path>, Vec<Path>, Vec<Path>), Error> {
     }).collect::<Vec<_>>();
 
     let removed = removed.into_iter().filter(|path| {
-        updated.iter().find(|&p| p == path).is_none()
+        updated.iter().find(|&p| equal!(p, path)).is_none()
     }).collect::<Vec<_>>();
 
     Ok((new, updated, removed))
@@ -137,7 +141,7 @@ fn print(title: &str, paths: &Vec<Path>) -> bool {
                      .map(|line| line.unwrap())
                      .collect::<Vec<_>>();
 
-    let len = paths.len();
+    let len = lines.len();
     if len == 0 {
         return false;
     }
@@ -148,7 +152,11 @@ fn print(title: &str, paths: &Vec<Path>) -> bool {
         if i + 1 == len {
             println!(" * {}.", line);
         } else if i + 2 == len {
-            println!(" * {} and", line);
+            if len == 2 {
+                println!(" * {} and", line);
+            } else {
+                println!(" * {}, and", line);
+            }
         } else {
             println!(" * {},", line);
         }
