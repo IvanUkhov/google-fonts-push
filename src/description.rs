@@ -111,7 +111,7 @@ impl Description {
             None => return,
         };
 
-        for count in range(1, chunks.len()).rev() {
+        for count in range(1, chunks.len() + 1).rev() {
             let mut name = String::new();
             for &chunk in chunks.iter().take(count) {
                 if !name.is_empty() {
