@@ -1,4 +1,4 @@
-#![feature(macro_rules)]
+#![feature(if_let, macro_rules)]
 
 extern crate git;
 extern crate hyper;
@@ -15,12 +15,9 @@ mod description;
 fn main() {
     macro_rules! ok(
         ($result:expr) => (
-            match $result {
-                Err(e) => {
-                    error(e);
-                    return;
-                },
-                _ => {},
+            if let Err(e) = $result {
+                error(e);
+                return;
             }
         );
     )
