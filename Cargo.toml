@@ -6,5 +6,5 @@ authors = ["Ivan Ukhov <ivan.ukhov@gmail.com>"]
 [dependencies.git]
 git = "https://github.com/stainless-steel/git"
 
-[dependencies.hyper]
-git = "https://github.com/hyperium/hyper"
+[dependencies.curl]
+git = "https://github.com/carllerche/curl-rust"

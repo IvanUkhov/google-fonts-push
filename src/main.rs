@@ -1,7 +1,7 @@
 #![feature(if_let, macro_rules)]
 
+extern crate curl;
 extern crate git;
-extern crate hyper;
 extern crate serialize;
 
 use git::Error;

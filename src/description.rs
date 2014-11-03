@@ -148,21 +148,9 @@ impl Description {
 }
 
 fn ping(url: &str) -> bool {
-    use hyper::Url;
-    use hyper::client::request::Request;
-    use hyper::status;
-
-    macro_rules! ok(
-        ($result:expr) => {
-            match $result {
-                Ok(result) => result,
-                Err(_) => return false,
-            }
-        };
-    )
-
-    let url = ok!(Url::parse(url));
-    let response = ok!(ok!(ok!(Request::head(url)).start()).send());
-
-    response.status == status::Ok
+    use curl::http;
+    match http::handle().head(url).exec() {
+        Ok(response) => response.get_code() == 200,
+        Err(_) => false,
+    }
 }
