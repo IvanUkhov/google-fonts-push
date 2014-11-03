@@ -179,15 +179,16 @@ fn display<T: Writer>(writer: &mut T, title: &str, paths: &Vec<Path>) -> bool {
     }
 
     ok!(writeln!(writer, "{}:", title));
+    ok!(writeln!(writer, ""));
 
     for (i, line) in lines.iter().enumerate() {
         if i + 1 == len {
-            ok!(writeln!(writer, " * {}.", line));
+            ok!(writeln!(writer, "* {}.", line));
         } else if i + 2 == len {
             if len == 2 {
-                ok!(writeln!(writer, " * {} and", line));
+                ok!(writeln!(writer, "* {} and", line));
             } else {
-                ok!(writeln!(writer, " * {}, and", line));
+                ok!(writeln!(writer, "* {}, and", line));
             }
         } else {
             ok!(writeln!(writer, " * {},", line));
