@@ -170,5 +170,23 @@ fn format(path: &Path) -> Option<String> {
         None => return None,
     }
 
+    match desc.url {
+        Some(ref url) => {
+            line.insert(0, '[');
+            line.push_str("](");
+            line.push_str(url.as_slice());
+            line.push_str(")");
+        },
+        None => {},
+    }
+
+    match desc.designer {
+        Some(ref designer) => {
+            line.push_str(" by ");
+            line.push_str(designer.as_slice());
+        },
+        None => {},
+    }
+
     Some(line)
 }
