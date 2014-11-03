@@ -3,6 +3,7 @@
 extern crate curl;
 extern crate git;
 extern crate serialize;
+extern crate time;
 
 use git::Error;
 use std::default::Default;
@@ -17,6 +18,7 @@ fn main() {
         ($result:expr) => (
             if let Err(e) = $result {
                 error(e);
+                std::os::set_exit_status(1);
                 return;
             }
         );
@@ -32,22 +34,32 @@ fn main() {
     let (command, path) = (args[1].clone(), Path::new(args[2].clone()));
 
     match command.as_slice() {
-        "status" => ok!(status(&path)),
+        "status" => ok!(status(&mut std::io::stdio::stdout(), &path)),
         "push" => ok!(push(&path)),
         _ => usage(),
     }
 }
 
-fn status(path: &Path) -> Result<(), Error> {
+fn status<T: Writer>(writer: &mut T, path: &Path) -> Result<(), Error> {
     #![allow(unused_assignments)]
 
-    macro_rules! print(
-        ($title:expr, $paths:expr, $sep:expr) => {
+    use std::io::MemWriter;
+
+    macro_rules! ok(
+        ($result:expr) => (
+            if let Err(_) = $result {
+                panic!("cannot write to a buffer");
+            }
+        );
+    )
+
+    macro_rules! display(
+        ($writer:expr, $title:expr, $paths:expr, $sep:expr) => {
             if !$paths.is_empty() {
                 if $sep {
-                    println!("");
+                    ok!(writeln!($writer, ""));
                 }
-                $sep = print($title, &$paths);
+                $sep = display($writer, $title, &$paths);
             }
         };
     )
@@ -55,9 +67,19 @@ fn status(path: &Path) -> Result<(), Error> {
     let (new, updated, removed) = try!(check(path));
     let mut sep = false;
 
-    print!("New", new, sep);
-    print!("Updated", updated, sep);
-    print!("Deleted", removed, sep);
+    let mut buffer = MemWriter::new();
+
+    display!(&mut buffer, "New", new, sep);
+    display!(&mut buffer, "Updated", updated, sep);
+    display!(&mut buffer, "Deleted", removed, sep);
+
+    let data = buffer.unwrap();
+
+    if data.len() > 0 {
+        ok!(writeln!(writer, "### {}", timestamp()));
+        ok!(writeln!(writer, ""));
+        ok!(writer.write(data.as_slice()));
+    }
 
     Ok(())
 }
@@ -134,7 +156,17 @@ fn check(dir: &Path) -> Result<(Vec<Path>, Vec<Path>, Vec<Path>), Error> {
     Ok((new, updated, removed))
 }
 
-fn print(title: &str, paths: &Vec<Path>) -> bool {
+fn display<T: Writer>(writer: &mut T, title: &str, paths: &Vec<Path>) -> bool {
+    #![allow(unused_must_use)]
+
+    macro_rules! ok(
+        ($result:expr) => (
+            if let Err(_) = $result {
+                panic!("cannot write to a buffer");
+            }
+        );
+    )
+
     let lines = paths.iter().by_ref()
                      .map(|path| format(path))
                      .filter(|line| line.is_some())
@@ -146,19 +178,19 @@ fn print(title: &str, paths: &Vec<Path>) -> bool {
         return false;
     }
 
-    println!("{}:", title);
+    ok!(writeln!(writer, "{}:", title));
 
     for (i, line) in lines.iter().enumerate() {
         if i + 1 == len {
-            println!(" * {}.", line);
+            ok!(writeln!(writer, " * {}.", line));
         } else if i + 2 == len {
             if len == 2 {
-                println!(" * {} and", line);
+                ok!(writeln!(writer, " * {} and", line));
             } else {
-                println!(" * {}, and", line);
+                ok!(writeln!(writer, " * {}, and", line));
             }
         } else {
-            println!(" * {},", line);
+            ok!(writeln!(writer, " * {},", line));
         }
     }
 
@@ -194,4 +226,14 @@ fn format(path: &Path) -> Option<String> {
     }
 
     Some(line)
+}
+
+fn timestamp() -> String {
+    let time = time::now();
+
+    const MONTHS: [&'static str, ..12] = ["January", "February", "March", "April",
+                                          "May", "June", "July", "August", "September",
+                                          "October", "November", "December"];
+
+    format!("{} {}, {}", MONTHS[time.tm_mon as uint], time.tm_mday, 1900 + time.tm_year)
 }
