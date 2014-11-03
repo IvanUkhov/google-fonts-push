@@ -4,4 +4,7 @@ version = "0.0.1"
 authors = ["Ivan Ukhov <ivan.ukhov@gmail.com>"]
 
 [dependencies.git]
-git = "https://github.com/IvanUkhov/rs-git"
+git = "https://github.com/stainless-steel/git"
+
+[dependencies.hyper]
+git = "https://github.com/hyperium/hyper"

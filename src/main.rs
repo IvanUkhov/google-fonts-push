@@ -1,25 +1,30 @@
 #![feature(macro_rules)]
 
 extern crate git;
+extern crate hyper;
+extern crate serialize;
 
+use git::Error;
 use std::default::Default;
 use std::os::args;
 
-use git::Error;
+use description::Description;
 
-macro_rules! ok(
-    ($result:expr) => (
-        match $result {
-            Ok(_) => {},
-            Err(e) => {
-                error(e);
-                return;
-            },
-        }
-    );
-)
+mod description;
 
 fn main() {
+    macro_rules! ok(
+        ($result:expr) => (
+            match $result {
+                Err(e) => {
+                    error(e);
+                    return;
+                },
+                _ => {},
+            }
+        );
+    )
+
     let args = args();
 
     if args.len() != 3 {
@@ -45,8 +50,7 @@ fn status(path: &Path) -> Result<(), Error> {
                 if $sep {
                     println!("");
                 }
-                $sep = true;
-                print($title, &$paths);
+                $sep = print($title, &$paths);
             }
         };
     )
@@ -79,7 +83,7 @@ fn usage() {
     println!("Usage: {} (status|push) <path>", args()[0]);
 }
 
-fn check(path: &Path) -> Result<(Vec<Path>, Vec<Path>, Vec<Path>), Error> {
+fn check(dir: &Path) -> Result<(Vec<Path>, Vec<Path>, Vec<Path>), Error> {
     use git::status;
     use git::status::Flags;
 
@@ -87,38 +91,84 @@ fn check(path: &Path) -> Result<(Vec<Path>, Vec<Path>, Vec<Path>), Error> {
     const UPDATED: Flags = Flags(status::IndexModified as u32 | status::WorkDirModified as u32);
     const REMOVED: Flags = Flags(status::IndexDeleted as u32 | status::WorkDirDeleted as u32);
 
-    let repo = try!(git::Repository::open(path));
+    let repo = try!(git::Repository::open(dir));
     let list = try!(repo.status(&Default::default()));
 
     let mut new = vec![];
     let mut updated = vec![];
     let mut removed = vec![];
 
-    for entry in list.iter() {
-        let (path, status) = (entry.new_path(), entry.status());
-
-        if status.any(NEW) {
-            new.push(path);
-        } else if status.any(UPDATED) {
-            updated.push(path);
-        } else if status.any(REMOVED) {
-            removed.push(path);
+    fn push(vec: &mut Vec<Path>, path: &Path) {
+        if vec.iter().find(|&p| p == path).is_none() {
+            vec.push(path.clone());
         }
     }
+
+    for entry in list.iter() {
+        let status = entry.status();
+        let path = dir.join(entry.new_path()).dir_path();
+
+        if status.any(NEW) {
+            push(&mut new, &path);
+        } else if status.any(UPDATED) {
+            push(&mut updated, &path);
+        } else if status.any(REMOVED) {
+            push(&mut removed, &path);
+        }
+    }
+
+    let new = new.into_iter().filter(|path| {
+        if removed.iter().find(|&p| p == path).is_some() {
+            push(&mut updated, path);
+            false
+        } else {
+            true
+        }
+    }).collect::<Vec<_>>();
+
+    let removed = removed.into_iter().filter(|path| {
+        updated.iter().find(|&p| p == path).is_none()
+    }).collect::<Vec<_>>();
 
     Ok((new, updated, removed))
 }
 
-fn print(title: &str, paths: &Vec<Path>) {
-    println!("{}:", title);
-    for path in paths.iter() {
-        println!("* {}", format(path));
+fn print(title: &str, paths: &Vec<Path>) -> bool {
+    let lines = paths.iter().by_ref()
+                     .map(|path| format(path))
+                     .filter(|line| line.is_some())
+                     .map(|line| line.unwrap())
+                     .collect::<Vec<_>>();
+
+    let len = paths.len();
+    if len == 0 {
+        return false;
     }
+
+    println!("{}:", title);
+
+    for (i, line) in lines.iter().enumerate() {
+        if i + 1 == len {
+            println!(" * {}.", line);
+        } else if i + 2 == len {
+            println!(" * {} and", line);
+        } else {
+            println!(" * {},", line);
+        }
+    }
+
+    true
 }
 
-fn format(path: &Path) -> String {
-    match path.with_extension("").filename_str() {
-        Some(s) => String::from_str(s),
-        None => "<unrecognized>".to_string(),
+fn format(path: &Path) -> Option<String> {
+    let mut line = String::new();
+
+    let desc = Description::load(path);
+
+    match desc.name {
+        Some(ref name) => line.push_str(name.as_slice()),
+        None => return None,
     }
+
+    Some(line)
 }
