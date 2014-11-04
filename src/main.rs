@@ -90,6 +90,10 @@ fn status<T: Writer>(writer: &mut T, path: &Path) -> IoResult<()> {
 fn push(path: &Path) -> GitResult<()> {
     let mut git = try!(git::open(path));
 
+    if try!(git.status()).len() == 0 {
+        return Ok(())
+    }
+
     try!(git.add_all());
     try!(git.commit("Synchronized with the official repository"));
     try!(git.push());
@@ -132,11 +136,11 @@ fn summarize(dir: &Path) -> GitResult<(Vec<Path>, Vec<Path>, Vec<Path>)> {
         let status = entry.status();
         let path = dir.join(entry.new_path());
 
-        if status.any(NEW) {
+        if status.has_any(NEW) {
             push(&mut new, &path);
-        } else if status.any(UPDATED) {
+        } else if status.has_any(UPDATED) {
             push(&mut updated, &path);
-        } else if status.any(REMOVED) {
+        } else if status.has_any(REMOVED) {
             push(&mut removed, &path);
         }
     }

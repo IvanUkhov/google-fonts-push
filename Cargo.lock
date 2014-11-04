@@ -22,7 +22,7 @@ source = "git+https://github.com/lifthrasiir/rust-encoding#a739425a3f3174a31fe38
 [[package]]
 name = "git"
 version = "0.0.1"
-source = "git+https://github.com/stainless-steel/git#895f6781f73c928bf077cdd8f96ad268893d6bf6"
+source = "git+https://github.com/stainless-steel/git#948e2d8536583045a19b18603d336db97855eac9"
 
 [[package]]
 name = "url"
