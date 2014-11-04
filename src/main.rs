@@ -5,8 +5,9 @@ extern crate git;
 extern crate serialize;
 extern crate time;
 
-use git::Error;
+use git::Result as GitResult;
 use std::default::Default;
+use std::io::IoResult;
 use std::os::args;
 
 use description::Description;
@@ -40,10 +41,19 @@ fn main() {
     }
 }
 
-fn status<T: Writer>(writer: &mut T, path: &Path) -> Result<(), Error> {
+fn error<T: std::fmt::Show>(e: T) {
+    println!("{}", e);
+}
+
+fn usage() {
+    println!("Usage: {} (status|push) <path>", args()[0]);
+}
+
+fn status<T: Writer>(writer: &mut T, path: &Path) -> IoResult<()> {
     #![allow(unused_assignments)]
 
     use std::io::MemWriter;
+    use std::io::{IoError, OtherIoError};
 
     macro_rules! ok(
         ($result:expr) => (
@@ -57,16 +67,23 @@ fn status<T: Writer>(writer: &mut T, path: &Path) -> Result<(), Error> {
         ($writer:expr, $title:expr, $paths:expr, $sep:expr) => {
             if !$paths.is_empty() {
                 if $sep {
-                    ok!(writeln!($writer, ""));
+                    try!(writeln!($writer, ""));
                 }
-                $sep = display($writer, $title, &$paths);
+                $sep = try!(display($writer, $title, &$paths));
             }
         };
     )
 
-    let (new, updated, removed) = try!(check(path));
-    let mut sep = false;
+    let (new, updated, removed) = match summarize(path) {
+        Ok(result) => result,
+        Err(error) => return Err(IoError {
+            kind: OtherIoError,
+            desc: "cannot check the status of the repository",
+            detail: Some(error.to_string()),
+        }),
+    };
 
+    let mut sep = false;
     let mut buffer = MemWriter::new();
 
     display!(&mut buffer, "New", new, sep);
@@ -76,15 +93,15 @@ fn status<T: Writer>(writer: &mut T, path: &Path) -> Result<(), Error> {
     let data = buffer.unwrap();
 
     if data.len() > 0 {
-        ok!(writeln!(writer, "### {}", timestamp()));
-        ok!(writeln!(writer, ""));
-        ok!(writer.write(data.as_slice()));
+        try!(writeln!(writer, "### {}", timestamp()));
+        try!(writeln!(writer, ""));
+        try!(writer.write(data.as_slice()));
     }
 
     Ok(())
 }
 
-fn push(path: &Path) -> Result<(), Error> {
+fn push(path: &Path) -> GitResult<()> {
     let mut git = try!(git::open(path));
 
     try!(git.add_all());
@@ -94,20 +111,18 @@ fn push(path: &Path) -> Result<(), Error> {
     Ok(())
 }
 
-fn error(e: Error) {
-    println!("{}", e);
-}
-
-fn usage() {
-    println!("Usage: {} (status|push) <path>", args()[0]);
-}
-
-fn check(dir: &Path) -> Result<(Vec<Path>, Vec<Path>, Vec<Path>), Error> {
+fn summarize(dir: &Path) -> GitResult<(Vec<Path>, Vec<Path>, Vec<Path>)> {
     use git::status;
     use git::status::Flags;
 
     macro_rules! equal(
         ($one:expr, $two:expr) => ($one.dir_path() == $two.dir_path());
+    )
+
+    macro_rules! find(
+        ($vector:expr, $element:expr) => (
+            $vector.iter().find(|p| equal!(p, $element))
+        );
     )
 
     const NEW: Flags = Flags(status::IndexNew as u32 | status::WorkDirNew as u32);
@@ -121,9 +136,9 @@ fn check(dir: &Path) -> Result<(Vec<Path>, Vec<Path>, Vec<Path>), Error> {
     let mut updated = vec![];
     let mut removed = vec![];
 
-    fn push(vec: &mut Vec<Path>, path: &Path) {
-        if vec.iter().find(|&p| equal!(p, path)).is_none() {
-            vec.push(path.clone());
+    fn push(vector: &mut Vec<Path>, path: &Path) {
+        if find!(vector, path).is_none() {
+            vector.push(path.clone());
         }
     }
 
@@ -141,7 +156,7 @@ fn check(dir: &Path) -> Result<(Vec<Path>, Vec<Path>, Vec<Path>), Error> {
     }
 
     let new = new.into_iter().filter(|path| {
-        if removed.iter().find(|&p| equal!(p, path)).is_some() {
+        if find!(removed, path).is_some() {
             push(&mut updated, path);
             false
         } else {
@@ -150,23 +165,13 @@ fn check(dir: &Path) -> Result<(Vec<Path>, Vec<Path>, Vec<Path>), Error> {
     }).collect::<Vec<_>>();
 
     let removed = removed.into_iter().filter(|path| {
-        updated.iter().find(|&p| equal!(p, path)).is_none()
+        (find!(updated, path).is_none())
     }).collect::<Vec<_>>();
 
     Ok((new, updated, removed))
 }
 
-fn display<T: Writer>(writer: &mut T, title: &str, paths: &Vec<Path>) -> bool {
-    #![allow(unused_must_use)]
-
-    macro_rules! ok(
-        ($result:expr) => (
-            if let Err(_) = $result {
-                panic!("cannot write to a buffer");
-            }
-        );
-    )
-
+fn display<T: Writer>(writer: &mut T, title: &str, paths: &Vec<Path>) -> IoResult<bool> {
     let lines = paths.iter().by_ref()
                      .map(|path| format(path))
                      .filter(|line| line.is_some())
@@ -175,27 +180,27 @@ fn display<T: Writer>(writer: &mut T, title: &str, paths: &Vec<Path>) -> bool {
 
     let len = lines.len();
     if len == 0 {
-        return false;
+        return Ok(false);
     }
 
-    ok!(writeln!(writer, "{}:", title));
-    ok!(writeln!(writer, ""));
+    try!(writeln!(writer, "{}:", title));
+    try!(writeln!(writer, ""));
 
     for (i, line) in lines.iter().enumerate() {
         if i + 1 == len {
-            ok!(writeln!(writer, "* {}.", line));
+            try!(writeln!(writer, "* {}.", line));
         } else if i + 2 == len {
             if len == 2 {
-                ok!(writeln!(writer, "* {} and", line));
+                try!(writeln!(writer, "* {} and", line));
             } else {
-                ok!(writeln!(writer, "* {}, and", line));
+                try!(writeln!(writer, "* {}, and", line));
             }
         } else {
-            ok!(writeln!(writer, " * {},", line));
+            try!(writeln!(writer, " * {},", line));
         }
     }
 
-    true
+    Ok(true)
 }
 
 fn format(path: &Path) -> Option<String> {
