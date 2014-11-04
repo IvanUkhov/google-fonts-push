@@ -50,18 +50,13 @@ fn usage() {
 }
 
 fn status<T: Writer>(writer: &mut T, path: &Path) -> IoResult<()> {
-    #![allow(unused_assignments)]
-
     use std::io::MemWriter;
     use std::io::{IoError, OtherIoError};
 
     macro_rules! display(
-        ($writer:expr, $title:expr, $paths:expr, $sep:expr) => {
+        ($writer:expr, $title:expr, $paths:expr) => {
             if !$paths.is_empty() {
-                if $sep {
-                    try!(writeln!($writer, ""));
-                }
-                $sep = try!(display($writer, $title, &$paths));
+                try!(display($writer, $title, &$paths));
             }
         };
     )
@@ -75,12 +70,11 @@ fn status<T: Writer>(writer: &mut T, path: &Path) -> IoResult<()> {
         }),
     };
 
-    let mut sep = false;
     let mut buffer = MemWriter::new();
 
-    display!(&mut buffer, "New", new, sep);
-    display!(&mut buffer, "Updated", updated, sep);
-    display!(&mut buffer, "Deleted", removed, sep);
+    display!(&mut buffer, "New", new);
+    display!(&mut buffer, "Updated", updated);
+    display!(&mut buffer, "Deleted", removed);
 
     let data = buffer.unwrap();
 
@@ -163,7 +157,7 @@ fn summarize(dir: &Path) -> GitResult<(Vec<Path>, Vec<Path>, Vec<Path>)> {
     Ok((new, updated, removed))
 }
 
-fn display<T: Writer>(writer: &mut T, title: &str, paths: &Vec<Path>) -> IoResult<bool> {
+fn display<T: Writer>(writer: &mut T, title: &str, paths: &Vec<Path>) -> IoResult<()> {
     let lines = paths.iter().by_ref()
                      .map(|path| format(path))
                      .filter(|line| line.is_some())
@@ -172,12 +166,11 @@ fn display<T: Writer>(writer: &mut T, title: &str, paths: &Vec<Path>) -> IoResul
 
     let len = lines.len();
     if len == 0 {
-        return Ok(false);
+        return Ok(());
     }
 
     try!(writeln!(writer, "{}:", title));
     try!(writeln!(writer, ""));
-
     for (i, line) in lines.iter().enumerate() {
         if i + 1 == len {
             try!(writeln!(writer, "* {}.", line));
@@ -191,8 +184,9 @@ fn display<T: Writer>(writer: &mut T, title: &str, paths: &Vec<Path>) -> IoResul
             try!(writeln!(writer, " * {},", line));
         }
     }
+    try!(writeln!(writer, ""));
 
-    Ok(true)
+    Ok(())
 }
 
 fn format(path: &Path) -> Option<String> {
