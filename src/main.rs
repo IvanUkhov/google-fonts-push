@@ -55,14 +55,6 @@ fn status<T: Writer>(writer: &mut T, path: &Path) -> IoResult<()> {
     use std::io::MemWriter;
     use std::io::{IoError, OtherIoError};
 
-    macro_rules! ok(
-        ($result:expr) => (
-            if let Err(_) = $result {
-                panic!("cannot write to a buffer");
-            }
-        );
-    )
-
     macro_rules! display(
         ($writer:expr, $title:expr, $paths:expr, $sep:expr) => {
             if !$paths.is_empty() {
