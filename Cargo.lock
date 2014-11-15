@@ -2,24 +2,24 @@
 name = "google-fonts-push"
 version = "0.0.1"
 dependencies = [
- "curl 0.0.1 (git+https://github.com/carllerche/curl-rust)",
+ "curl 0.1.0 (git+https://github.com/carllerche/curl-rust)",
  "git 0.0.1 (git+https://github.com/stainless-steel/git)",
  "time 0.0.1 (git+http://github.com/rust-lang/time)",
 ]
 
 [[package]]
 name = "curl"
-version = "0.0.1"
-source = "git+https://github.com/carllerche/curl-rust#b8441d0607b61e8086e2815c90cc40e36a941d5e"
+version = "0.1.0"
+source = "git+https://github.com/carllerche/curl-rust#dbd06414ba879572faae75bfd0320a38fbbc3518"
 dependencies = [
- "curl-sys 0.0.1 (git+https://github.com/carllerche/curl-rust)",
+ "curl-sys 0.1.0 (git+https://github.com/carllerche/curl-rust)",
  "url 0.1.0 (git+https://github.com/servo/rust-url)",
 ]
 
 [[package]]
 name = "curl-sys"
-version = "0.0.1"
-source = "git+https://github.com/carllerche/curl-rust#b8441d0607b61e8086e2815c90cc40e36a941d5e"
+version = "0.1.0"
+source = "git+https://github.com/carllerche/curl-rust#dbd06414ba879572faae75bfd0320a38fbbc3518"
 dependencies = [
  "libz-sys 0.0.1 (git+https://github.com/alexcrichton/libz-sys)",
  "openssl-sys 0.0.1 (git+https://github.com/alexcrichton/openssl-sys)",
@@ -29,7 +29,7 @@ dependencies = [
 [[package]]
 name = "encoding"
 version = "0.2.0"
-source = "git+https://github.com/lifthrasiir/rust-encoding#05f1cadf7c51ae2896dce749b56c160bbcf000a1"
+source = "git+https://github.com/lifthrasiir/rust-encoding#d67c864d8dfeb16a00656e9472133b0e2206781f"
 dependencies = [
  "encoding-index-japanese 1.0.20140915 (git+https://github.com/lifthrasiir/rust-encoding)",
  "encoding-index-korean 1.0.20140915 (git+https://github.com/lifthrasiir/rust-encoding)",
@@ -41,32 +41,52 @@ dependencies = [
 [[package]]
 name = "encoding-index-japanese"
 version = "1.0.20140915"
-source = "git+https://github.com/lifthrasiir/rust-encoding#05f1cadf7c51ae2896dce749b56c160bbcf000a1"
+source = "git+https://github.com/lifthrasiir/rust-encoding#d67c864d8dfeb16a00656e9472133b0e2206781f"
+dependencies = [
+ "encoding_index_tests 0.1.0 (git+https://github.com/lifthrasiir/rust-encoding)",
+]
 
 [[package]]
 name = "encoding-index-korean"
 version = "1.0.20140915"
-source = "git+https://github.com/lifthrasiir/rust-encoding#05f1cadf7c51ae2896dce749b56c160bbcf000a1"
+source = "git+https://github.com/lifthrasiir/rust-encoding#d67c864d8dfeb16a00656e9472133b0e2206781f"
+dependencies = [
+ "encoding_index_tests 0.1.0 (git+https://github.com/lifthrasiir/rust-encoding)",
+]
 
 [[package]]
 name = "encoding-index-simpchinese"
 version = "1.0.20140915"
-source = "git+https://github.com/lifthrasiir/rust-encoding#05f1cadf7c51ae2896dce749b56c160bbcf000a1"
+source = "git+https://github.com/lifthrasiir/rust-encoding#d67c864d8dfeb16a00656e9472133b0e2206781f"
+dependencies = [
+ "encoding_index_tests 0.1.0 (git+https://github.com/lifthrasiir/rust-encoding)",
+]
 
 [[package]]
 name = "encoding-index-singlebyte"
 version = "1.0.20140915"
-source = "git+https://github.com/lifthrasiir/rust-encoding#05f1cadf7c51ae2896dce749b56c160bbcf000a1"
+source = "git+https://github.com/lifthrasiir/rust-encoding#d67c864d8dfeb16a00656e9472133b0e2206781f"
+dependencies = [
+ "encoding_index_tests 0.1.0 (git+https://github.com/lifthrasiir/rust-encoding)",
+]
 
 [[package]]
 name = "encoding-index-tradchinese"
 version = "1.0.20140915"
-source = "git+https://github.com/lifthrasiir/rust-encoding#05f1cadf7c51ae2896dce749b56c160bbcf000a1"
+source = "git+https://github.com/lifthrasiir/rust-encoding#d67c864d8dfeb16a00656e9472133b0e2206781f"
+dependencies = [
+ "encoding_index_tests 0.1.0 (git+https://github.com/lifthrasiir/rust-encoding)",
+]
+
+[[package]]
+name = "encoding_index_tests"
+version = "0.1.0"
+source = "git+https://github.com/lifthrasiir/rust-encoding#d67c864d8dfeb16a00656e9472133b0e2206781f"
 
 [[package]]
 name = "gcc"
 version = "0.0.1"
-source = "git+https://github.com/alexcrichton/gcc-rs#f23b4ba15348508b9ac557fc7eed2733f65bc1ee"
+source = "git+https://github.com/alexcrichton/gcc-rs#f25b3ba9c40303781189cc137fb98fffe5b56de7"
 
 [[package]]
 name = "git"
@@ -105,7 +125,7 @@ source = "git+https://github.com/alexcrichton/pkg-config-rs#d24a08d87d63df8dc952
 [[package]]
 name = "time"
 version = "0.0.1"
-source = "git+http://github.com/rust-lang/time#76698f52381a78cf654dbedfefd04c28a9806788"
+source = "git+http://github.com/rust-lang/time#f8c6b514021f0eef55267220b9435cb221d7d6c3"
 dependencies = [
  "gcc 0.0.1 (git+https://github.com/alexcrichton/gcc-rs)",
 ]
