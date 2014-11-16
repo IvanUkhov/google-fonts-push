@@ -91,7 +91,7 @@ source = "git+https://github.com/alexcrichton/gcc-rs#f25b3ba9c40303781189cc137fb
 [[package]]
 name = "git"
 version = "0.0.1"
-source = "git+https://github.com/stainless-steel/git#884ea7995c00e6c00ad567fbc8eae9c26513e079"
+source = "git+https://github.com/stainless-steel/git#b6cd5b32027f6360243120aa08c382f2d5dd3da6"
 dependencies = [
  "libgit2-sys 0.0.1 (git+https://github.com/stainless-steel/git)",
 ]
@@ -99,7 +99,7 @@ dependencies = [
 [[package]]
 name = "libgit2-sys"
 version = "0.0.1"
-source = "git+https://github.com/stainless-steel/git#884ea7995c00e6c00ad567fbc8eae9c26513e079"
+source = "git+https://github.com/stainless-steel/git#b6cd5b32027f6360243120aa08c382f2d5dd3da6"
 
 [[package]]
 name = "libz-sys"
@@ -125,7 +125,7 @@ source = "git+https://github.com/alexcrichton/pkg-config-rs#d24a08d87d63df8dc952
 [[package]]
 name = "time"
 version = "0.0.1"
-source = "git+http://github.com/rust-lang/time#f8c6b514021f0eef55267220b9435cb221d7d6c3"
+source = "git+http://github.com/rust-lang/time#d6219df8537e74fa87eeb7d372681c276dc5f9ff"
 dependencies = [
  "gcc 0.0.1 (git+https://github.com/alexcrichton/gcc-rs)",
 ]
