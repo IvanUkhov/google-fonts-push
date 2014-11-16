@@ -90,12 +90,11 @@ fn status<T: Writer>(writer: &mut T, path: &Path) -> IoResult<()> {
 fn push(path: &Path) -> GitResult<()> {
     let mut git = try!(git::open(path));
 
-    if try!(git.status()).len() == 0 {
-        return Ok(())
+    if try!(git.status()).len() > 0 {
+        try!(git.add_all());
+        try!(git.commit("Synchronized with the official repository"));
     }
 
-    try!(git.add_all());
-    try!(git.commit("Synchronized with the official repository"));
     try!(git.push());
 
     Ok(())
