@@ -91,7 +91,7 @@ source = "git+https://github.com/alexcrichton/gcc-rs#f25b3ba9c40303781189cc137fb
 [[package]]
 name = "git"
 version = "0.0.1"
-source = "git+https://github.com/stainless-steel/git#b6cd5b32027f6360243120aa08c382f2d5dd3da6"
+source = "git+https://github.com/stainless-steel/git#6480b6bcdab1b9a6356633b9fc3ce2ca8ff1b837"
 dependencies = [
  "libgit2-sys 0.0.1 (git+https://github.com/stainless-steel/git)",
 ]
@@ -99,7 +99,7 @@ dependencies = [
 [[package]]
 name = "libgit2-sys"
 version = "0.0.1"
-source = "git+https://github.com/stainless-steel/git#b6cd5b32027f6360243120aa08c382f2d5dd3da6"
+source = "git+https://github.com/stainless-steel/git#6480b6bcdab1b9a6356633b9fc3ce2ca8ff1b837"
 
 [[package]]
 name = "libz-sys"
