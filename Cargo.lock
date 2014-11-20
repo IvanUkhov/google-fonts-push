@@ -10,7 +10,7 @@ dependencies = [
 [[package]]
 name = "curl"
 version = "0.1.0"
-source = "git+https://github.com/carllerche/curl-rust#e6e31d8d601bffdf3c9b31993e6ffe3bc8a99618"
+source = "git+https://github.com/carllerche/curl-rust#c5dc613286e33ea89c9b0acc22a53398a9aa6cd9"
 dependencies = [
  "curl-sys 0.1.0 (git+https://github.com/carllerche/curl-rust)",
  "url 0.1.0 (git+https://github.com/servo/rust-url)",
@@ -19,7 +19,7 @@ dependencies = [
 [[package]]
 name = "curl-sys"
 version = "0.1.0"
-source = "git+https://github.com/carllerche/curl-rust#e6e31d8d601bffdf3c9b31993e6ffe3bc8a99618"
+source = "git+https://github.com/carllerche/curl-rust#c5dc613286e33ea89c9b0acc22a53398a9aa6cd9"
 dependencies = [
  "libz-sys 0.0.1 (git+https://github.com/alexcrichton/libz-sys)",
  "openssl-sys 0.0.1 (git+https://github.com/sfackler/rust-openssl)",
@@ -91,7 +91,7 @@ source = "git+https://github.com/alexcrichton/gcc-rs#f25b3ba9c40303781189cc137fb
 [[package]]
 name = "git"
 version = "0.0.1"
-source = "git+https://github.com/stainless-steel/git#5293f667affb58c64969948c5b977cd9de824a53"
+source = "git+https://github.com/stainless-steel/git#2ddb5545d56229f60f126ac2e61bef0fb9f8fb0f"
 dependencies = [
  "libgit2-sys 0.0.1 (git+https://github.com/stainless-steel/git)",
 ]
@@ -99,7 +99,7 @@ dependencies = [
 [[package]]
 name = "libgit2-sys"
 version = "0.0.1"
-source = "git+https://github.com/stainless-steel/git#5293f667affb58c64969948c5b977cd9de824a53"
+source = "git+https://github.com/stainless-steel/git#2ddb5545d56229f60f126ac2e61bef0fb9f8fb0f"
 
 [[package]]
 name = "libz-sys"
@@ -112,7 +112,7 @@ dependencies = [
 [[package]]
 name = "openssl-sys"
 version = "0.0.1"
-source = "git+https://github.com/sfackler/rust-openssl#af5533d936558a77c2de8c5d2d572bb1f89dfada"
+source = "git+https://github.com/sfackler/rust-openssl#3e98880fe8cdeaccd3c08e423bc6ce7a211bae0a"
 dependencies = [
  "pkg-config 0.0.1 (git+https://github.com/alexcrichton/pkg-config-rs)",
 ]
@@ -133,7 +133,7 @@ dependencies = [
 [[package]]
 name = "url"
 version = "0.1.0"
-source = "git+https://github.com/servo/rust-url#c3d32dae4c5641d034a848d42f88db48dd9feb96"
+source = "git+https://github.com/servo/rust-url#a7570d763501228b4e00559aba4eb5d6137f56f3"
 dependencies = [
  "encoding 0.2.1 (git+https://github.com/lifthrasiir/rust-encoding)",
 ]
