@@ -3,11 +3,9 @@ name = "google-fonts-push"
 version = "0.0.1"
 authors = ["Ivan Ukhov <ivan.ukhov@gmail.com>"]
 
+[dependencies]
+git = "0.0.2"
+time = "0.0.3"
+
 [dependencies.curl]
 git = "https://github.com/carllerche/curl-rust"
-
-[dependencies.git]
-git = "https://github.com/stainless-steel/git"
-
-[dependencies.time]
-git = "http://github.com/rust-lang/time"
