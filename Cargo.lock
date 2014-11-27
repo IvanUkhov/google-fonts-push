@@ -3,7 +3,7 @@ name = "google-fonts-push"
 version = "0.0.1"
 dependencies = [
  "curl 0.1.0 (git+https://github.com/carllerche/curl-rust)",
- "git 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "git 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "time 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -22,7 +22,7 @@ version = "0.1.0"
 source = "git+https://github.com/carllerche/curl-rust#c1b96e146f6752353a1e84cca932c628e6bf73af"
 dependencies = [
  "libz-sys 0.0.1 (git+https://github.com/alexcrichton/libz-sys)",
- "openssl-sys 0.0.1 (git+https://github.com/sfackler/rust-openssl)",
+ "openssl-sys 0.1.1 (git+https://github.com/sfackler/rust-openssl)",
  "pkg-config 0.0.1 (git+https://github.com/alexcrichton/pkg-config-rs)",
 ]
 
@@ -33,15 +33,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "git"
-version = "0.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "tape 0.0.3 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "libtar-sys"
-version = "0.0.4"
+version = "0.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -54,10 +46,10 @@ dependencies = [
 
 [[package]]
 name = "openssl-sys"
-version = "0.0.1"
-source = "git+https://github.com/sfackler/rust-openssl#b084ddc7b0fe9c7816fef6e415a05db6ec43fb71"
+version = "0.1.1"
+source = "git+https://github.com/sfackler/rust-openssl#5340344a5cf3783ecc7f16d0518d1b6584b4a56a"
 dependencies = [
- "pkg-config 0.0.1 (git+https://github.com/alexcrichton/pkg-config-rs)",
+ "pkg-config 0.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -66,12 +58,9 @@ version = "0.0.1"
 source = "git+https://github.com/alexcrichton/pkg-config-rs#d24a08d87d63df8dc9526c503944415b86719220"
 
 [[package]]
-name = "tape"
-version = "0.0.3"
+name = "pkg-config"
+version = "0.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "libtar-sys 0.0.4 (registry+https://github.com/rust-lang/crates.io-index)",
-]
 
 [[package]]
 name = "time"
@@ -84,5 +73,5 @@ dependencies = [
 [[package]]
 name = "url"
 version = "0.1.0"
-source = "git+https://github.com/servo/rust-url#a838a41263472de966f7ec8db758caa9cc4699a4"
+source = "git+https://github.com/servo/rust-url#ce3d3176c1b7dfa99b81f29396b68fd5fe25a755"
 

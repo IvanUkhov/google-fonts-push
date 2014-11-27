@@ -76,7 +76,7 @@ fn status<T: Writer>(writer: &mut T, path: &Path) -> IoResult<()> {
     display!(&mut buffer, "Updated", updated);
     display!(&mut buffer, "Deleted", removed);
 
-    let data = buffer.unwrap();
+    let data = buffer.into_inner();
 
     if data.len() > 0 {
         try!(writeln!(writer, "### {}", timestamp()));
