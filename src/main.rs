@@ -183,7 +183,7 @@ fn display<T: Writer>(writer: &mut T, title: &str, paths: &Vec<Path>) -> IoResul
                 try!(writeln!(writer, "* {}, and", line));
             }
         } else {
-            try!(writeln!(writer, " * {},", line));
+            try!(writeln!(writer, "* {},", line));
         }
     }
     try!(writeln!(writer, ""));
