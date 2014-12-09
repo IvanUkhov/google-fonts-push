@@ -1,4 +1,4 @@
-#![feature(if_let, macro_rules)]
+#![feature(macro_rules)]
 
 extern crate curl;
 extern crate git;
@@ -101,8 +101,7 @@ fn push(path: &Path) -> GitResult<()> {
 }
 
 fn summarize(dir: &Path) -> GitResult<(Vec<Path>, Vec<Path>, Vec<Path>)> {
-    use git::status;
-    use git::status::Flags;
+    use git::status::{Flag, Flags};
 
     macro_rules! equal(
         ($one:expr, $two:expr) => ($one.dir_path() == $two.dir_path());
@@ -114,9 +113,9 @@ fn summarize(dir: &Path) -> GitResult<(Vec<Path>, Vec<Path>, Vec<Path>)> {
         );
     )
 
-    const NEW: Flags = Flags(status::IndexNew as u32 | status::WorkDirNew as u32);
-    const UPDATED: Flags = Flags(status::IndexModified as u32 | status::WorkDirModified as u32);
-    const REMOVED: Flags = Flags(status::IndexDeleted as u32 | status::WorkDirDeleted as u32);
+    const NEW: Flags = Flags(Flag::IndexNew as u32 | Flag::WorkDirNew as u32);
+    const UPDATED: Flags = Flags(Flag::IndexModified as u32 | Flag::WorkDirModified as u32);
+    const REMOVED: Flags = Flags(Flag::IndexDeleted as u32 | Flag::WorkDirDeleted as u32);
 
     let repo = try!(git::Repository::open(dir));
     let list = try!(repo.status(&Default::default()));
