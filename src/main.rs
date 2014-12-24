@@ -2,7 +2,7 @@
 
 extern crate curl;
 extern crate git;
-extern crate serialize;
+extern crate "rustc-serialize" as rustc_serialize;
 extern crate time;
 
 use git::Result as GitResult;
@@ -23,7 +23,7 @@ fn main() {
                 return;
             }
         );
-    )
+    );
 
     let args = args();
 
@@ -59,7 +59,7 @@ fn status<T: Writer>(writer: &mut T, path: &Path) -> IoResult<()> {
                 try!(display($writer, $title, &$paths));
             }
         };
-    )
+    );
 
     let (new, updated, removed) = match summarize(path) {
         Ok(result) => result,
@@ -105,13 +105,13 @@ fn summarize(dir: &Path) -> GitResult<(Vec<Path>, Vec<Path>, Vec<Path>)> {
 
     macro_rules! equal(
         ($one:expr, $two:expr) => ($one.dir_path() == $two.dir_path());
-    )
+    );
 
     macro_rules! find(
         ($vector:expr, $element:expr) => (
             $vector.iter().find(|p| equal!(p, $element))
         );
-    )
+    );
 
     const NEW: Flags = Flags(Flag::IndexNew as u32 | Flag::WorkDirNew as u32);
     const UPDATED: Flags = Flags(Flag::IndexModified as u32 | Flag::WorkDirModified as u32);

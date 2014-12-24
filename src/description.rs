@@ -1,4 +1,4 @@
-use serialize::json;
+use rustc_serialize::json;
 
 pub struct Description {
     pub name: Option<String>,
@@ -6,7 +6,7 @@ pub struct Description {
     pub url: Option<String>,
 }
 
-#[deriving(Decodable)]
+#[deriving(RustcDecodable)]
 struct MetaData {
     name: String,
     designer: String,
@@ -43,7 +43,7 @@ impl Description {
                     Err(_) => return,
                 }
             };
-        )
+        );
 
         let path = path.dir_path().join("METADATA.json");
 
