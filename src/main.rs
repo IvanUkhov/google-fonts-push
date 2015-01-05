@@ -225,9 +225,9 @@ fn format(path: &Path) -> Option<String> {
 fn timestamp() -> String {
     let time = time::now();
 
-    const MONTHS: [&'static str, ..12] = ["January", "February", "March", "April",
-                                          "May", "June", "July", "August", "September",
-                                          "October", "November", "December"];
+    const MONTHS: [&'static str; 12] = ["January", "February", "March", "April",
+                                        "May", "June", "July", "August", "September",
+                                        "October", "November", "December"];
 
     format!("{} {}, {}", MONTHS[time.tm_mon as uint], time.tm_mday, 1900 + time.tm_year)
 }

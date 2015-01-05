@@ -6,7 +6,7 @@ pub struct Description {
     pub url: Option<String>,
 }
 
-#[deriving(RustcDecodable)]
+#[derive(RustcDecodable)]
 struct MetaData {
     name: String,
     designer: String,
