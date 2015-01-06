@@ -1,4 +1,4 @@
-#![feature(macro_rules)]
+#![feature(macro_rules, old_orphan_check)]
 
 extern crate curl;
 extern crate git;
