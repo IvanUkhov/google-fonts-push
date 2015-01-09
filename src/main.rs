@@ -1,5 +1,3 @@
-#![feature(macro_rules, old_orphan_check)]
-
 extern crate curl;
 extern crate git;
 extern crate "rustc-serialize" as rustc_serialize;

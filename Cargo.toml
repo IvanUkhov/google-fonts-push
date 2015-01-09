@@ -4,7 +4,7 @@ version = "0.0.1"
 authors = ["Ivan Ukhov <ivan.ukhov@gmail.com>"]
 
 [dependencies]
-curl = "0.1.7"
-git = "0.0.12"
-rustc-serialize = "0.2.4"
-time = "0.1.9"
+curl = "0.1.9"
+git = "0.0.14"
+rustc-serialize = "0.2.6"
+time = "0.1.11"
