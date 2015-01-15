@@ -1,3 +1,5 @@
+#![allow(unstable)]
+
 extern crate curl;
 extern crate git;
 extern crate "rustc-serialize" as rustc_serialize;
@@ -40,7 +42,7 @@ fn main() {
 }
 
 fn error<T: std::fmt::Show>(e: T) {
-    println!("{}", e);
+    println!("{:?}", e);
 }
 
 fn usage() {
@@ -64,7 +66,7 @@ fn status<T: Writer>(writer: &mut T, path: &Path) -> IoResult<()> {
         Err(error) => return Err(IoError {
             kind: OtherIoError,
             desc: "cannot check the status of the repository",
-            detail: Some(error.to_string()),
+            detail: Some(format!("{:?}", error)),
         }),
     };
 
@@ -227,5 +229,5 @@ fn timestamp() -> String {
                                         "May", "June", "July", "August", "September",
                                         "October", "November", "December"];
 
-    format!("{} {}, {}", MONTHS[time.tm_mon as uint], time.tm_mday, 1900 + time.tm_year)
+    format!("{} {}, {}", MONTHS[time.tm_mon as usize], time.tm_mday, 1900 + time.tm_year)
 }
