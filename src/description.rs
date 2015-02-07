@@ -33,8 +33,8 @@ impl Description {
     }
 
     fn populate_by_metadata(desc: &mut Description, path: &Path) {
-        use std::io::fs;
-        use std::io::fs::PathExtensions;
+        use std::old_io::fs;
+        use std::old_io::fs::PathExtensions;
 
         macro_rules! ok(
             ($result:expr) => {

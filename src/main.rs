@@ -1,4 +1,4 @@
-#![allow(unstable)]
+#![feature(core, path)]
 
 extern crate curl;
 extern crate git;
@@ -7,8 +7,8 @@ extern crate time;
 
 use git::Result as GitResult;
 use std::default::Default;
-use std::io::IoResult;
-use std::os::args;
+use std::old_io::IoResult;
+use std::env::args;
 
 use description::Description;
 
@@ -25,33 +25,45 @@ fn main() {
         );
     );
 
-    let args = args();
+    let mut args = args();
 
-    if args.len() != 3 {
-        usage();
-        return;
-    }
+    args.next();
 
-    let (command, path) = (args[1].clone(), Path::new(args[2].clone()));
+    let command = match args.next() {
+        Some(command) => command.into_string().ok().unwrap(),
+        _ => {
+            usage();
+            return;
+        }
+    };
 
-    match command.as_slice() {
-        "status" => ok!(status(&mut std::io::stdio::stdout(), &path)),
+    let path = match args.next() {
+        Some(path) => Path::new(path.into_string().ok().unwrap()),
+        _ => {
+            usage();
+            return;
+        }
+    };
+
+    match &command[] {
+        "status" => ok!(status(&mut std::old_io::stdio::stdout(), &path)),
         "push" => ok!(push(&path)),
         _ => usage(),
     }
 }
 
-fn error<T: std::fmt::Show>(e: T) {
+fn error<T: std::fmt::Debug>(e: T) {
     println!("{:?}", e);
 }
 
 fn usage() {
-    println!("Usage: {} (status|push) <path>", args()[0]);
+    println!("Usage: {} (status|push) <path>",
+        args().next().unwrap().into_string().ok().unwrap());
 }
 
 fn status<T: Writer>(writer: &mut T, path: &Path) -> IoResult<()> {
-    use std::io::MemWriter;
-    use std::io::{IoError, OtherIoError};
+    use std::old_io::MemWriter;
+    use std::old_io::{IoError, OtherIoError};
 
     macro_rules! display(
         ($writer:expr, $title:expr, $paths:expr) => {
@@ -81,7 +93,7 @@ fn status<T: Writer>(writer: &mut T, path: &Path) -> IoResult<()> {
     if data.len() > 0 {
         try!(writeln!(writer, "### {}", timestamp()));
         try!(writeln!(writer, ""));
-        try!(writer.write(data.as_slice()));
+        try!(writer.write_all(&data[]));
     }
 
     Ok(())
@@ -197,7 +209,7 @@ fn format(path: &Path) -> Option<String> {
     let desc = Description::load(path);
 
     match desc.name {
-        Some(ref name) => line.push_str(name.as_slice()),
+        Some(ref name) => line.push_str(&name[]),
         None => return None,
     }
 
@@ -205,7 +217,7 @@ fn format(path: &Path) -> Option<String> {
         Some(ref url) => {
             line.insert(0, '[');
             line.push_str("](");
-            line.push_str(url.as_slice());
+            line.push_str(&url[]);
             line.push_str(")");
         },
         None => {},
@@ -214,7 +226,7 @@ fn format(path: &Path) -> Option<String> {
     match desc.designer {
         Some(ref designer) => {
             line.push_str(" by ");
-            line.push_str(designer.as_slice());
+            line.push_str(&designer[]);
         },
         None => {},
     }
