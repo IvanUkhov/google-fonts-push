@@ -1,4 +1,4 @@
-#![feature(core, path)]
+#![feature(core, env, io, os, path)]
 
 extern crate curl;
 extern crate git;
